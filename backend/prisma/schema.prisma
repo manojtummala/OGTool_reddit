@@ -1,0 +1,68 @@
+// prisma/schema.prisma
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Company {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+
+  personas    Persona[]
+  targets     Target[]
+  weeks       WeekPlan[]
+}
+
+model Persona {
+  id          String   @id @default(cuid())
+  username    String   // stored as "u/username"
+  description String?
+
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+
+  posts       Post[]
+}
+
+model Target {
+  id        String   @id @default(cuid())
+  subreddit String   // stored as "r/subreddit"
+
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+
+  posts     Post[]
+}
+
+model WeekPlan {
+  id        String  @id @default(cuid())
+  startDate DateTime @default(now())
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  posts     Post[]
+}
+
+model Post {
+  id         String   @id @default(cuid())
+  day        Int      // 1–7
+  title      String?
+  body       String?
+  subreddit  String
+  personaName String?
+  
+  weekId     String
+  week       WeekPlan @relation(fields: [weekId], references: [id])
+
+  personaId  String?
+  persona    Persona? @relation(fields: [personaId], references: [id])
+
+  targetId   String?
+  target     Target?  @relation(fields: [targetId], references: [id])
+}
