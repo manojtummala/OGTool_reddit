@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { generateWeek } from "../controllers/generation.controller";
+import { generateWeek } from "../controllers/generate.controller";
 
 const router = Router();
 

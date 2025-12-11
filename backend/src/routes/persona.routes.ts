@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { createPersona, getPersonas, updatePersona } from "../controllers/personas";
+import { createPersona, updatePersona, deletePersona } from "../controllers/persona.controller";
 
 const router = Router();
 
-router.get("/", getPersonas);
 router.post("/", createPersona);
 router.put("/:id", updatePersona);
+router.delete("/:id", deletePersona);
 
 export default router;

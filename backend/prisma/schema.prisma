@@ -10,7 +10,7 @@ generator client {
 
 model Company {
   id          String   @id @default(cuid())
-  name        String
+  name        String   @unique
   description String?
 
   personas    Persona[]

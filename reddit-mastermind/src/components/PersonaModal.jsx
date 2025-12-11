@@ -2,27 +2,24 @@
 import React, { useState, useEffect } from "react";
 
 export default function PersonaModal({ persona = null, onCancel, onSave }) {
-  const [name, setName] = useState("");
   const [username, setUsername] = useState(""); 
   const [description, setDescription] = useState("");
 
   useEffect(() => {
     if (persona) {
-      setName(persona.name || "");
       setUsername(persona.username ? persona.username.replace(/^u\//, "") : "");
       setDescription(persona.description || "");
     }
   }, [persona]);
 
   function handleSubmit() {
-    if (!name.trim()) return alert("Persona name is required");
     if (!username.trim()) return alert("Username is required");
+    if (!description.trim()) return alert("Description is required");
 
     const formattedUsername = `u/${username.replace(/^u\//, "")}`;
 
     onSave({
       id: persona?.id ?? crypto.randomUUID(),
-      name,
       username: formattedUsername,
       description,
     });
@@ -36,13 +33,6 @@ export default function PersonaModal({ persona = null, onCancel, onSave }) {
         </h2>
 
         <div className="flex flex-col gap-3">
-          <input
-            className="border rounded p-2"
-            placeholder="Persona Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-
           <input
             className="border rounded p-2"
             placeholder="Reddit Username (ex: johndoe)"
