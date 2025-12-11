@@ -1,9 +1,7 @@
 import { prisma } from "../index";
 import { Request, Response } from "express";
 
-/**
- * Extracts the comment text from any frontend field safely
- */
+
 function extractCommentText(comment: any): string | null {
   if (typeof comment.text === "string") return comment.text;
   if (typeof comment.body === "string") return comment.body;
@@ -34,7 +32,6 @@ async function processCommentTree(comment: any, postId: string, parentId: string
       });
 
       if (existingComment) {
-        // UPDATE existing
         dbComment = await prisma.comment.update({
           where: { id: commentId },
           data: {
@@ -43,7 +40,6 @@ async function processCommentTree(comment: any, postId: string, parentId: string
           }
         });
       } else {
-        // Comment ID doesn't exist or doesn't belong to this post, create new
         console.warn(`Comment ID ${commentId} not found for post ${postId}, creating new comment`);
         dbComment = await prisma.comment.create({
           data: {
@@ -56,7 +52,6 @@ async function processCommentTree(comment: any, postId: string, parentId: string
         });
       }
     } catch (err) {
-      // If update fails (e.g., invalid ID format), create new comment
       console.warn(`Failed to update comment ${commentId}, creating new:`, err);
       dbComment = await prisma.comment.create({
         data: {
@@ -69,7 +64,6 @@ async function processCommentTree(comment: any, postId: string, parentId: string
       });
     }
   } else {
-    // CREATE new
     dbComment = await prisma.comment.create({
       data: {
         text,
@@ -81,7 +75,6 @@ async function processCommentTree(comment: any, postId: string, parentId: string
     });
   }
 
-  // Process replies recursively
   if (Array.isArray(comment.replies)) {
     await Promise.all(
       comment.replies.map((reply: any) =>
@@ -97,13 +90,11 @@ export const updatePostWithComments = async (req: Request, res: Response): Promi
   try {
     const { post_id, title, body, subreddit, comments } = req.body;
 
-    // 1. Update the post
     const updatedPost = await prisma.post.update({
       where: { id: post_id },
       data: { title, body, subreddit },
     });
 
-    // 2. Comments processing
     if (Array.isArray(comments)) {
       await Promise.all(
         comments.map((comment) => processCommentTree(comment, post_id))

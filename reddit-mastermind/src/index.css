@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-/* small app defaults */
 html, body, #root { 
   height: 100%; 
 }
@@ -9,7 +8,6 @@ body {
   @apply bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-slate-800; 
 }
 
-/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -59,7 +57,6 @@ body {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Smooth transitions */
 * {
   transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);

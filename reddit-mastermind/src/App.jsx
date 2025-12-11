@@ -1,4 +1,3 @@
-// src/App.jsx
 import React, { useState } from "react";
 import MainForm from "./components/MainForm";
 import CalendarTable from "./components/CalendarTable";
@@ -32,6 +31,7 @@ function normalizeWeek(raw) {
     posts: Array.isArray(raw.posts) ? raw.posts : [],
     personas: Array.isArray(raw.personas) ? raw.personas : [],
     overall_score: raw.overall_score ?? null,
+    quality_evaluation: raw.quality_evaluation ?? null,
   };
 }
 
@@ -40,12 +40,11 @@ function normalizeWeeks(list) {
   return (
     list
       .map((w) => normalizeWeek(w))
-      .filter((w) => w !== null) // Filter out null weeks
-      // always newest → oldest
+      .filter((w) => w !== null)
       .sort((a, b) => {
         if (!a.startDate && !b.startDate) return 0;
-        if (!a.startDate) return 1; // null dates go to end
-        if (!b.startDate) return -1; // null dates go to end
+        if (!a.startDate) return 1;
+        if (!b.startDate) return -1;
         return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
       })
   );
@@ -164,7 +163,6 @@ export default function App() {
         comments: updated.comments,
       });
 
-      // update weeks locally
       const updatedWeeks = weeks.map((week) => ({
         ...week,
         posts: week.posts.map((p) =>
@@ -253,7 +251,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* View modal (Reddit-like) */}
       {viewingPost && !editingPost && (
         <PostViewModal
           post={viewingPost}
@@ -266,7 +263,6 @@ export default function App() {
         />
       )}
 
-      {/* Edit modal (form-based) */}
       {editingPost && (
         <EditorModal
           post={editingPost}

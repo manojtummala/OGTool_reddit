@@ -18,7 +18,11 @@ import generateRouter from "./routes/generate.routes";
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  credentials: true
+}));
 app.use(express.json());
 
 app.use("/company", companyRoutes);

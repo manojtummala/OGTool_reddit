@@ -46,10 +46,8 @@ export default function MainForm({ onSubmit, onReset }) {
   function handleSavePersona(persona) {
     const existingIndex = personas.findIndex((p) => p.id === persona.id);
     if (existingIndex >= 0) {
-      // Update existing persona
       setPersonas(personas.map((p) => (p.id === persona.id ? persona : p)));
     } else {
-      // Add new persona
       setPersonas([...personas, persona]);
     }
     setEditingPersona(null);
@@ -72,21 +70,17 @@ export default function MainForm({ onSubmit, onReset }) {
     };
 
     if (!isSaved) {
-      // SAVE MODE
       const resp = await onSubmit(payload, "save");
 
       if (resp?.companyId) {
         setCompanyId(resp.companyId);
       }
-
-      // Fetch stored record to populate UI with merged data
       if (companyName.trim()) {
         await getCompanyInfo(companyName.trim());
       }
 
       setIsSaved(true);
     } else {
-      // GENERATE MODE
       await onSubmit(payload, "generate");
     }
   }

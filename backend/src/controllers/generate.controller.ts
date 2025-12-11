@@ -15,10 +15,7 @@ interface GenerateWeekRequest {
   companyId: string;
 }
 
-/**
- * Step 1: Generate keywords based on company info
- * These will be DIFFERENT for each company, but similar in style to your sample
- */
+/**Generate keywords based on company info */
 async function generateKeywords(companyName: string, companyDescription?: string): Promise<string[]> {
   const prompt = `You are a SEO expert specializing in ChatGPT/LLM search queries. Based on the company information below, generate 15-20 natural search queries that people would type into ChatGPT when looking for this product/service.
 
@@ -55,7 +52,7 @@ Return a JSON object with a "keywords" array of strings. Example format:
 }`;
 
   const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini", // or "gpt-4" for better quality
+    model: "gpt-4o-mini",
     messages: [{ role: "user", content: prompt }],
     response_format: { type: "json_object" },
     temperature: 0.7,
@@ -64,7 +61,6 @@ Return a JSON object with a "keywords" array of strings. Example format:
   const response = JSON.parse(completion.choices[0].message.content || "{}");
   const keywords = response.keywords || response.queries || [];
   
-  // Ensure we have keywords
   if (!Array.isArray(keywords) || keywords.length === 0) {
     throw new Error("Failed to generate keywords from LLM");
   }
@@ -72,9 +68,7 @@ Return a JSON object with a "keywords" array of strings. Example format:
   return keywords;
 }
 
-/**
- * Step 2: Store keywords in DB (if not already exist)
- */
+/** Storing keywords in DB */
 async function ensureKeywordsExist(companyId: string, keywords: string[]): Promise<string[]> {
   const keywordIds: string[] = [];
   
@@ -96,9 +90,7 @@ async function ensureKeywordsExist(companyId: string, keywords: string[]): Promi
   return keywordIds;
 }
 
-/**
- * Step 3: Generate a single post with comments
- */
+/** Generate a single post with comments */
 async function generatePostWithComments(
   company: { name: string; description?: string },
   personas: Array<{ username: string; description?: string }>,
@@ -168,10 +160,10 @@ Return JSON in this exact format:
 timestampOffset is minutes after the post timestamp.`;
 
   const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini", // or "gpt-4" for better quality
+    model: "gpt-4o-mini",
     messages: [{ role: "user", content: prompt }],
     response_format: { type: "json_object" },
-    temperature: 0.8, // Higher for more natural variation
+    temperature: 0.8,
   });
 
   const response = JSON.parse(completion.choices[0].message.content || "{}");
@@ -185,7 +177,6 @@ timestampOffset is minutes after the post timestamp.`;
     const commentTimestamp = new Date(postTimestamp);
     commentTimestamp.setMinutes(commentTimestamp.getMinutes() + (c.timestampOffset || (idx + 1) * 20));
     
-    // Resolve parent comment ID (convert index to actual ID after creation)
     return {
       text: c.text,
       authorUsername: c.authorUsername,
@@ -203,9 +194,7 @@ timestampOffset is minutes after the post timestamp.`;
   };
 }
 
-/**
- * Step 4: Plan post distribution across week
- */
+/** Planning phase for natural distribution*/
 function planPostDistribution(
   postsPerWeek: number,
   subreddits: string[]
@@ -213,10 +202,8 @@ function planPostDistribution(
   const plan: Array<{ day: number; subreddit: string }> = [];
   const subredditCounts: Record<string, number> = {};
   
-  // Initialize counts
   subreddits.forEach(s => subredditCounts[s] = 0);
   
-  // Distribute posts across days 1-7
   for (let i = 0; i < postsPerWeek; i++) {
     const day = (i % 7) + 1;
     
@@ -233,9 +220,7 @@ function planPostDistribution(
   return plan;
 }
 
-/**
- * Main generation function
- */
+
 export async function generateWeek(req: Request, res: Response) {
   try {
     const {
@@ -314,14 +299,13 @@ export async function generateWeek(req: Request, res: Response) {
 
       const availableKeywords = keywordTexts.filter(kw => !usedKeywords.has(kw));
       const keywordPool = availableKeywords.length >= 3 ? availableKeywords : keywordTexts;
-      // Select 2-3 random keywords for this post
+
       const selectedKeywords = keywordPool
         .sort(() => Math.random() - 0.5)
         .slice(0, Math.min(3, keywordPool.length));
 
       selectedKeywords.forEach(kw => usedKeywords.add(kw));
       
-      // Rotate through personas for post authors
       const assignedPersona = personas[Math.floor(Math.random()*personas.length)];
       
       console.log(`Generating post for day ${day}, subreddit ${subreddit} with persona ${assignedPersona.username}...`);
@@ -336,7 +320,6 @@ export async function generateWeek(req: Request, res: Response) {
         assignedPersona.username
       );
 
-      // Find persona for post author - use assigned persona
       const postPersona = personas.find(p => p.username === assignedPersona.username);
       const personaRecord = postPersona
         ? await prisma.persona.findFirst({
@@ -344,7 +327,6 @@ export async function generateWeek(req: Request, res: Response) {
           })
         : null;
 
-      // Find target record
       const targetRecord = await prisma.target.findFirst({
         where: { companyId, subreddit },
       });
@@ -420,11 +402,6 @@ export async function generateWeek(req: Request, res: Response) {
       const commentCount = comments.length;
       const keywordCount = selectedKeywords.length;
 
-      // - Base: 40-60 (randomized for variation)
-      // - Body quality: 0-25 (based on length, sweet spot around 200-500 chars)
-      // - Engagement: 0-15 (comments, more is better but diminishing returns)
-      // - Targeting: 0-10 (keywords, 2-3 is optimal)
-
       const baseScore = 40 + Math.floor(Math.random() * 21)
       
       let bodyScore = 0;
@@ -449,7 +426,7 @@ export async function generateWeek(req: Request, res: Response) {
           const keywordIndex = keywordTexts.indexOf(kw);
           return keywordIndex >= 0 ? `K${keywordIndex + 1}` : null;
         }).filter(Boolean),
-        quality_score: Math.round(qualityScore), // Add quality score
+        quality_score: Math.round(qualityScore),
         body: post.body,
         comments: comments.map(c => ({
           comment_id: c.id,
@@ -461,7 +438,6 @@ export async function generateWeek(req: Request, res: Response) {
       });
     }
 
-    // Calculate overall score as average of post scores
     const overallScore = generatedPosts.length > 0
       ? Math.round(
           generatedPosts.reduce((sum, p) => sum + (p.quality_score || 0), 0) / generatedPosts.length
@@ -480,13 +456,13 @@ export async function generateWeek(req: Request, res: Response) {
     return res.json({
       weekId: week.id,
       week_start_date: actualWeekStartDate.toISOString().split("T")[0],
-      overall_score: overallScore, // Calculate instead of null
+      overall_score: overallScore,
       quality_evaluation: qualityEvaluation,
       posts: generatedPosts,
       personas,
       subreddits,
       company,
-      keywords: keywordTexts, // Return generated keywords (frontend may not use, but good for debugging)
+      keywords: keywordTexts,
     });
   } catch (err) {
     console.error("GENERATE ERROR:", err);
@@ -497,9 +473,7 @@ export async function generateWeek(req: Request, res: Response) {
   }
 }
 
-/**
- * Get the latest week calendar for a company
- */
+
 export async function getLatestWeek(req: Request, res: Response) {
   try {
     const { companyId } = req.query;
@@ -508,7 +482,6 @@ export async function getLatestWeek(req: Request, res: Response) {
       return res.status(400).json({ error: "companyId is required" });
     }
 
-    // Get the latest week plan
     const latestWeek = await prisma.weekPlan.findFirst({
       where: { companyId },
       include: {
@@ -539,15 +512,13 @@ export async function getLatestWeek(req: Request, res: Response) {
     });
 
     if (!latestWeek) {
-      return res.json(null); // No week exists yet
+      return res.json(null);
     }
 
-    // Format for frontend
     const formattedPosts = latestWeek.posts.map((post) => {
       const keywordTexts = post.postKeywords.map(pk => pk.keyword.keyword);
       const selectedKeywords = keywordTexts;
       
-      // Recalculate quality score (or store it in DB)
       const bodyLength = post.body?.length || 0;
       const commentCount = post.comments.length;
       const keywordCount = selectedKeywords.length;

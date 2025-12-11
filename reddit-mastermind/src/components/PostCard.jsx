@@ -1,4 +1,3 @@
-// src/components/PostCard.jsx
 import React from "react";
 
 export default function PostCard({ post, onEdit }) {

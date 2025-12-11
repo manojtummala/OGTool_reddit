@@ -1,4 +1,3 @@
-// src/components/EditorModal.jsx
 import React, { useState, useEffect } from "react";
 import { XMarkIcon, ArrowUpIcon, ArrowDownIcon } from "@heroicons/react/24/outline";
 
@@ -35,7 +34,6 @@ export default function EditorModal({ post, onClose, onSave }) {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 overflow-y-auto p-4 animate-fadeIn backdrop-blur-sm">
       <div className="bg-white w-full max-w-4xl rounded-xl shadow-2xl max-h-[90vh] overflow-auto animate-slideIn border border-slate-200">
-        {/* Header */}
         <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center z-10">
           <h3 className="text-xl font-semibold">Edit Post</h3>
           <button
@@ -47,11 +45,8 @@ export default function EditorModal({ post, onClose, onSave }) {
           </button>
         </div>
 
-        {/* Content */}
         <div className="p-6">
-          {/* Main Post - Reddit-like structure */}
           <div className="flex gap-4 mb-6">
-            {/* Vote column (left) */}
             <div className="flex flex-col items-center gap-1 pt-2">
               <button className="p-1 hover:bg-slate-100 rounded cursor-pointer">
                 <ArrowUpIcon className="w-5 h-5 text-slate-400 hover:text-orange-500" />
@@ -62,9 +57,7 @@ export default function EditorModal({ post, onClose, onSave }) {
               </button>
             </div>
 
-            {/* Post content (right) */}
             <div className="flex-1">
-              {/* Post header */}
               <div className="mb-2">
                 <span className="text-xs text-slate-500">
                   <span className="font-semibold text-slate-700">{draft.subreddit}</span>
@@ -75,7 +68,6 @@ export default function EditorModal({ post, onClose, onSave }) {
                 </span>
               </div>
 
-              {/* Title input */}
               <input
                 value={draft.title}
                 onChange={(e) => updateField("title", e.target.value)}
@@ -83,7 +75,6 @@ export default function EditorModal({ post, onClose, onSave }) {
                 placeholder="Post title..."
               />
 
-              {/* Body textarea */}
               <textarea
                 value={draft.body}
                 onChange={(e) => updateField("body", e.target.value)}
@@ -91,7 +82,6 @@ export default function EditorModal({ post, onClose, onSave }) {
                 placeholder="Post content..."
               />
 
-              {/* Action buttons */}
               <div className="flex gap-2 mb-6">
                 <button
                   onClick={() => updateField("subreddit", prompt("Enter subreddit:", draft.subreddit) || draft.subreddit)}
@@ -103,7 +93,6 @@ export default function EditorModal({ post, onClose, onSave }) {
             </div>
           </div>
 
-          {/* Comments section */}
           <div className="border-t pt-6">
             <div className="flex justify-between items-center mb-4">
               <h4 className="text-lg font-semibold">
@@ -120,7 +109,6 @@ export default function EditorModal({ post, onClose, onSave }) {
             <div className="space-y-4">
               {draft.comments?.map((comment, idx) => (
                 <div key={comment.comment_id} className="flex gap-4">
-                  {/* Thread line */}
                   <div className="flex flex-col items-center">
                     <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center">
                       <span className="text-xs text-slate-500">+</span>
@@ -128,7 +116,6 @@ export default function EditorModal({ post, onClose, onSave }) {
                     <div className="w-0.5 h-full bg-slate-200 mt-1"></div>
                   </div>
 
-                  {/* Comment content */}
                   <div className="flex-1 bg-slate-50 rounded-lg p-4 border border-slate-200">
                     <div className="flex justify-between items-start mb-2">
                       <div className="text-xs text-slate-500">
@@ -162,7 +149,6 @@ export default function EditorModal({ post, onClose, onSave }) {
           </div>
         </div>
 
-        {/* Footer */}
         <div className="sticky bottom-0 bg-white border-t px-6 py-4 flex justify-end gap-3">
           <button
             onClick={onClose}

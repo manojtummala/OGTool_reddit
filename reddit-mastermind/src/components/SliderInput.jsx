@@ -1,4 +1,3 @@
-// components/SliderInput.jsx
 import { Layout } from "lucide-react";
 import SectionCard from "./SectionCard";
 

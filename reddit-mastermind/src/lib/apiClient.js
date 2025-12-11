@@ -1,5 +1,3 @@
-// src/lib/apiClient.js
-
 const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:3000";
 
 export async function saveAllData(payload) {
@@ -34,7 +32,6 @@ export async function generateWeek(payload) {
 }
 
 export async function fetchCompanyData(name) {
-  // Option 1: Get all companies and filter client-side
   const res = await fetch(`${API_BASE}/company`);
   if (!res.ok) {
     const text = await res.text();

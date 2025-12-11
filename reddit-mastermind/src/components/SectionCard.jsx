@@ -1,4 +1,3 @@
-// src/components/SectionCard.jsx
 export default function SectionCard({ icon: Icon, title, children, iconColor = "text-slate-700" }) {
   return (
     <div className="bg-white p-5 rounded-xl border shadow-sm">

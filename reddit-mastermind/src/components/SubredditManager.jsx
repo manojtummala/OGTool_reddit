@@ -1,4 +1,3 @@
-// components/SubredditManager.jsx
 import { Hash, X } from "lucide-react";
 import SectionCard from "./SectionCard";
 import { useState } from "react";

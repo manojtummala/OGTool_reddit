@@ -1,4 +1,3 @@
-// src/components/CalendarTable.jsx
 import React from "react";
 import PostCard from "./PostCard";
 
@@ -29,10 +28,8 @@ export default function CalendarTable({ weekData, onEdit }) {
           key={week.id || week.week_id || wIndex}
           className="border-l-4 border-blue-400 pl-6 relative"
         >
-          {/* Timeline Dot */}
           <div className="absolute -left-[9px] top-2 w-4 h-4 bg-blue-500 rounded-full shadow-md"></div>
 
-          {/* WEEK HEADER */}
           <div className="mb-6 flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
             <div>
               <h2 className="text-xl font-bold text-slate-800">
@@ -44,7 +41,6 @@ export default function CalendarTable({ weekData, onEdit }) {
             </div>
 
             <div className="flex gap-3">
-              {/* Overall Score */}
               <div className="px-4 py-2 bg-white rounded-lg shadow-sm border border-blue-200">
                 <span className="text-xs text-slate-500">Overall score:</span>
                 <span className="ml-2 text-lg font-bold text-green-600">
@@ -54,12 +50,10 @@ export default function CalendarTable({ weekData, onEdit }) {
             </div>
           </div>
 
-          {/* Quality Evaluation Section */}
           {week.quality_evaluation && (
             <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-100">
               <h3 className="text-sm font-bold text-slate-700 mb-3">Quality Assessment</h3>
               
-              {/* Strengths */}
               {week.quality_evaluation.strengths && week.quality_evaluation.strengths.length > 0 && (
                 <div className="mb-3">
                   <p className="text-xs font-semibold text-green-700 mb-1">✓ Strengths:</p>
@@ -71,7 +65,6 @@ export default function CalendarTable({ weekData, onEdit }) {
                 </div>
               )}
 
-              {/* Issues */}
               {week.quality_evaluation.issues && week.quality_evaluation.issues.length > 0 && (
                 <div>
                   <p className="text-xs font-semibold text-orange-700 mb-1">⚠ Issues:</p>
@@ -83,7 +76,6 @@ export default function CalendarTable({ weekData, onEdit }) {
                 </div>
               )}
 
-              {/* Adjusted Score */}
               {week.quality_evaluation.score !== week.overall_score && (
                 <div className="mt-3 pt-3 border-t border-purple-200">
                   <p className="text-xs text-slate-600">
@@ -95,7 +87,6 @@ export default function CalendarTable({ weekData, onEdit }) {
             </div>
           )}
 
-          {/* POSTS */}
           <div className="space-y-4">
             {week.posts.map((post, idx) => (
               <div

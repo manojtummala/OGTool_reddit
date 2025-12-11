@@ -2,12 +2,11 @@ import { prisma } from "../index";
 import { Request, Response } from "express";
 import { evaluateWeekQuality } from "./generate.controller";
 
-// list weeks
 export const getWeeks = async (req: Request, res: Response): Promise<void> => {
   try {
     const weeks = await prisma.weekPlan.findMany({
       include: { posts: true },
-      orderBy: { startDate: "desc" },   // ⬅️ newest first
+      orderBy: { startDate: "desc" },
     });
 
     res.json(weeks);
@@ -55,13 +54,11 @@ export const getWeeksByCompany = async (req: Request, res: Response): Promise<vo
       orderBy: { startDate: "desc" },
     });
 
-    // Format weeks similar to getLatestWeek
     const formattedWeeks = weeks.map((week) => {
       const formattedPosts = week.posts.map((post) => {
         const keywordTexts = post.postKeywords.map(pk => pk.keyword.keyword);
         const selectedKeywords = keywordTexts;
         
-        // Recalculate quality score
         const bodyLength = post.body?.length || 0;
         const commentCount = post.comments.length;
         const keywordCount = selectedKeywords.length;
@@ -81,7 +78,7 @@ export const getWeeksByCompany = async (req: Request, res: Response): Promise<vo
 
         return {
           post_id: post.id,
-          id: post.id, // Also include id for compatibility
+          id: post.id, 
           subreddit: post.subreddit,
           title: post.title,
           author_username: post.personaName || post.persona?.username || "",
@@ -96,14 +93,14 @@ export const getWeeksByCompany = async (req: Request, res: Response): Promise<vo
           body: post.body,
           comments: post.comments.map(c => ({
             comment_id: c.id,
-            id: c.id, // Also include id for compatibility
+            id: c.id, 
             parent_comment_id: c.parentCommentId,
-            parentCommentId: c.parentCommentId, // Also include camelCase
+            parentCommentId: c.parentCommentId,
             author_username: c.authorUsername,
             timestamp: c.timestamp.toISOString().replace("T", " ").substring(0, 19),
             text: c.text,
-            content: c.text, // Also include content for compatibility
-            body: c.text, // Also include body for compatibility
+            content: c.text, 
+            body: c.text,
           })),
         };
       });
@@ -112,7 +109,6 @@ export const getWeeksByCompany = async (req: Request, res: Response): Promise<vo
         ? Math.round(formattedPosts.reduce((sum, p) => sum + (p.quality_score || 0), 0) / formattedPosts.length)
         : null;
 
-      // Evaluate week quality
       const qualityEvaluation = evaluateWeekQuality({
         overall_score: overallScore,
         posts: formattedPosts,
@@ -122,13 +118,13 @@ export const getWeeksByCompany = async (req: Request, res: Response): Promise<vo
 
       return {
         id: week.id,
-        week_id: week.id, // Also include week_id for compatibility
+        week_id: week.id, 
         startDate: week.startDate.toISOString().split("T")[0],
-        start_date: week.startDate.toISOString().split("T")[0], // Also include snake_case
-        week_start_date: week.startDate.toISOString().split("T")[0], // Also include week_start_date
-        week_start: week.startDate.toISOString().split("T")[0], // Also include week_start
+        start_date: week.startDate.toISOString().split("T")[0],
+        week_start_date: week.startDate.toISOString().split("T")[0],
+        week_start: week.startDate.toISOString().split("T")[0],
         overall_score: overallScore,
-        quality_evaluation: qualityEvaluation, // Add this
+        quality_evaluation: qualityEvaluation,
         posts: formattedPosts,
         personas: week.company.personas,
         company: {
@@ -147,7 +143,6 @@ export const getWeeksByCompany = async (req: Request, res: Response): Promise<vo
   }
 };
 
-// get single week
 export const getWeek = async (req: Request, res: Response): Promise<void> => {
   try{
     const id = req.params.id;
@@ -166,7 +161,6 @@ export const getWeek = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// create week (normally done by generation)
 export const createWeek = async (req: Request, res: Response): Promise<void> => {
   try{
     const { companyId, startDate } = req.body;

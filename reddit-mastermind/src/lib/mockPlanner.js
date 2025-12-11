@@ -1,7 +1,4 @@
-// src/lib/mockPlanner.js
-// Returns a single week calendar with 3 posts (based on your sample)
 export function generateMockWeek({ company, personas, subreddits, keywords, postsPerWeek }) {
-  // For simplicity we return the sample data you provided, slightly adapted
   const weekStart = "2025-12-08";
 
   const posts = [

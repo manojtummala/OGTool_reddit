@@ -1,4 +1,3 @@
-// src/controllers/save.controller.ts
 import { Request, Response } from "express";
 import { prisma } from "../index";
 
@@ -24,7 +23,6 @@ export async function saveAll(req: Request, res: Response) {
 
     const companyName = company.name.trim();
 
-    // 1) Upsert company (schema has name @unique)
     const companyRecord = await prisma.company.upsert({
       where: { name: companyName },
       create: {
@@ -38,19 +36,16 @@ export async function saveAll(req: Request, res: Response) {
 
     const companyId = companyRecord.id;
 
-    // 2) Merge personas (create new ones, update existing descriptions)
     if (Array.isArray(personas)) {
       for (const p of personas) {
         const username = normalizeUsername(p.username);
         if (!username) continue;
 
-        // Find an existing persona for this company with same username
         const existing = await prisma.persona.findFirst({
           where: { companyId, username },
         });
 
         if (existing) {
-          // Update description if different (non-destructive)
           const newDesc = p.description ?? "";
           if ((existing.description ?? "") !== newDesc) {
             await prisma.persona.update({
@@ -59,7 +54,6 @@ export async function saveAll(req: Request, res: Response) {
             });
           }
         } else {
-          // Create new persona
           await prisma.persona.create({
             data: {
               username,
@@ -71,7 +65,6 @@ export async function saveAll(req: Request, res: Response) {
       }
     }
 
-    // 3) Merge targets (create new ones if not exist)
     if (Array.isArray(subreddits)) {
       for (const s of subreddits) {
         const subreddit = normalizeSubreddit(s);
@@ -88,15 +81,6 @@ export async function saveAll(req: Request, res: Response) {
         }
       }
     }
-
-    // 4) Optionally store postsPerWeek on company (if you want to persist this)
-    // If you want to persist postsPerWeek, uncomment the block below:
-    // await prisma.company.update({
-    //   where: { id: companyId },
-    //   data: { /* add a settings field or a postsPerWeek column to Company */ }
-    // });
-
-    // 5) Re-fetch the full company with related data to return to client
     const fullCompany = await prisma.company.findUnique({
       where: { id: companyId },
       include: {
