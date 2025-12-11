@@ -15,6 +15,7 @@ model Company {
 
   personas    Persona[]
   targets     Target[]
+  keywords    Keyword[]
   weeks       WeekPlan[]
 }
 
@@ -27,6 +28,7 @@ model Persona {
   company     Company  @relation(fields: [companyId], references: [id])
 
   posts       Post[]
+  comments    Comment[]
 }
 
 model Target {
@@ -37,6 +39,15 @@ model Target {
   company   Company  @relation(fields: [companyId], references: [id])
 
   posts     Post[]
+}
+
+model Keyword {
+  id        String   @id @default(cuid())
+  keyword   String   // e.g., "best ai presentation maker"
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+
+  postKeywords PostKeyword[]
 }
 
 model WeekPlan {
@@ -65,4 +76,34 @@ model Post {
 
   targetId   String?
   target     Target?  @relation(fields: [targetId], references: [id])
+
+  postKeywords PostKeyword[]
+  comments     Comment[]
+}
+
+model PostKeyword {
+  id        String  @id @default(cuid())
+  postId    String
+  post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  keywordId String
+  keyword   Keyword @relation(fields: [keywordId], references: [id])
+
+  @@unique([postId, keywordId])
+}
+
+model Comment {
+  id              String   @id @default(cuid())
+  text            String
+  authorUsername  String   // persona username
+  timestamp       DateTime
+  
+  postId          String
+  post            Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  
+  parentCommentId String?
+  parentComment    Comment? @relation("CommentReplies", fields: [parentCommentId], references: [id])
+  replies          Comment[] @relation("CommentReplies")
+  
+  personaId       String?
+  persona         Persona? @relation(fields: [personaId], references: [id])
 }

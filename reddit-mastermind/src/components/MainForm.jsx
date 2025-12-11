@@ -4,7 +4,7 @@ import { UserGroupIcon, BuildingOffice2Icon, GlobeAltIcon, XMarkIcon } from "@he
 import PersonaModal from "./PersonaModal";
 import { fetchCompanyData } from "../lib/apiClient";
 
-export default function MainForm({ onSubmit }) {
+export default function MainForm({ onSubmit, onReset }) {
   const [companyName, setCompanyName] = useState("");
   const [companyDescription, setCompanyDescription] = useState("");
   const [companyId, setCompanyId] = useState(null);
@@ -57,6 +57,9 @@ export default function MainForm({ onSubmit }) {
   }
 
   async function handleSubmit() {
+    if(!companyName) return alert("Company Name is required");
+    if(!companyDescription) return alert("Company Description is required");
+    
     const payload = {
       company: {
         name: companyName,
@@ -88,8 +91,19 @@ export default function MainForm({ onSubmit }) {
     }
   }
 
+  function handleReset() {
+    setCompanyName("");
+    setCompanyDescription("");
+    setCompanyId(null);
+    setPersonas([]);
+    setSubreddits([]);
+    setPostsPerWeek(3);
+    setIsSaved(false);
+    if (onReset) onReset();
+  }
+
   return (
-    <div className="bg-white border border-slate-200 shadow rounded-2xl p-6 h-full flex flex-col gap-6">
+    <div className="bg-white border border-slate-200 shadow rounded-2xl p-6 flex flex-col gap-6">
 
       {/* COMPANY SECTION */}
       <SectionCard icon={BuildingOffice2Icon} title="Company Profile" iconColor="text-blue-600">
@@ -232,16 +246,24 @@ export default function MainForm({ onSubmit }) {
       </SectionCard>
 
       {/* SAVE / GENERATE BUTTON */}
-      <button
-        onClick={handleSubmit}
-        className={`p-3 rounded-lg text-white font-semibold cursor-pointer transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 ${
-          isSaved 
-            ? "bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600" 
-            : "bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600"
-        }`}
-      >
-        {isSaved ? "Generate Calendar" : "Save Data"}
-      </button>
+      <div className="flex gap-2">
+        <button
+          onClick={handleReset}
+          className="flex-1 p-3 rounded-lg bg-gradient-to-r from-gray-400 to-gray-500 text-white font-semibold cursor-pointer transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+        >
+          Reset
+        </button>
+        <button
+          onClick={handleSubmit}
+          className={`p-3 rounded-lg text-white font-semibold cursor-pointer transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 ${
+            isSaved 
+              ? "bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600" 
+              : "bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600"
+          }`}
+        >
+          {isSaved ? "Generate Calendar" : "Save Data"}
+        </button>
+      </div>
 
       {editingPersona && (
         <PersonaModal
